@@ -1,4 +1,4 @@
-.PHONY: up down build logs test lint clean
+.PHONY: up down build logs test lint format check clean
 
 up:
 	docker compose up -d
@@ -14,6 +14,15 @@ logs:
 
 test:
 	docker compose exec api pytest -v
+
+lint:
+	ruff check .
+
+format:
+	ruff format .
+
+check: lint
+	ruff format --check .
 
 clean:
 	docker compose down -v
