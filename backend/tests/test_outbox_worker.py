@@ -89,15 +89,11 @@ async def test_outbox_processor_successful_delivery(db_session: AsyncSession):
     async def mock_successful_adapter(event):
         return True
 
-    processed_count = await simulate_outbox_batch_delivery(
-        db_session, mock_successful_adapter
-    )
+    processed_count = await simulate_outbox_batch_delivery(db_session, mock_successful_adapter)
     assert processed_count == 1
 
     # Verify event status is updated to DONE
-    result = await db_session.execute(
-        select(OutboxEvent).where(OutboxEvent.id == outbox_event.id)
-    )
+    result = await db_session.execute(select(OutboxEvent).where(OutboxEvent.id == outbox_event.id))
     updated_event = result.scalar_one()
     assert updated_event.status == OutboxStatus.DONE
 
@@ -138,9 +134,7 @@ async def test_outbox_processor_retry_and_failure(db_session: AsyncSession):
     await simulate_outbox_batch_delivery(db_session, mock_failing_adapter)
 
     # Verify event status reached FAILED due to max attempts exceeded
-    result = await db_session.execute(
-        select(OutboxEvent).where(OutboxEvent.id == outbox_event.id)
-    )
+    result = await db_session.execute(select(OutboxEvent).where(OutboxEvent.id == outbox_event.id))
     updated_event = result.scalar_one()
     assert updated_event.status == OutboxStatus.FAILED
     assert updated_event.attempts == 3
