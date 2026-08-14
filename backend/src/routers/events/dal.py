@@ -61,6 +61,11 @@ class EventsDAL:
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
+    async def get_ticket_by_id(self, ticket_id: uuid.UUID) -> Ticket | None:
+        stmt = select(Ticket).where(Ticket.id == ticket_id)
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()
+
     async def create_ticket(
         self,
         external_client_id: str,
@@ -106,9 +111,16 @@ class EventsDAL:
         if ticket is None:
             return None
 
-        # Calculate first response time
+        # Calculate first response time safely
         ticket.status = TicketStatus.CLOSED
         ticket.closed_at = closed_at
-        ticket.first_response_time = closed_at - ticket.created_at
+
+        created = ticket.created_at
+        if created.tzinfo is None and closed_at.tzinfo is not None:
+            created = created.replace(tzinfo=UTC)
+        elif created.tzinfo is not None and closed_at.tzinfo is None:
+            closed_at = closed_at.replace(tzinfo=UTC)
+
+        ticket.first_response_time = closed_at - created
         await self.session.flush()
         return ticket
