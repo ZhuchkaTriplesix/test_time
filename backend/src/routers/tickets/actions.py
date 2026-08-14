@@ -35,8 +35,10 @@ async def list_open_tickets(
 
     ticket_responses: list[TicketResponse] = []
     for t in tickets:
-        # Calculate dynamic elapsed wait time
-        wait_seconds = max(0.0, (now - t.created_at).total_seconds())
+        created_at_aware = (
+            t.created_at.replace(tzinfo=UTC) if t.created_at.tzinfo is None else t.created_at
+        )
+        wait_seconds = max(0.0, (now - created_at_aware).total_seconds())
 
         # Real-time dynamic SLA status computation
         current_sla = compute_dynamic_sla_status(

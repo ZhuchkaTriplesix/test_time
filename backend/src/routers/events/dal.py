@@ -3,7 +3,6 @@ from datetime import UTC, datetime
 from typing import Any
 
 from sqlalchemy import select
-from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.routers.events.models import Event, EventType
@@ -26,8 +25,15 @@ class EventsDAL:
 
         Returns Event instance if inserted, or None if duplicate.
         """
+        # Use appropriate dialect insert statement
+        bind = self.session.bind or self.session.get_bind()
+        if bind and bind.dialect.name == "sqlite":
+            from sqlalchemy.dialects.sqlite import insert as dialect_insert
+        else:
+            from sqlalchemy.dialects.postgresql import insert as dialect_insert
+
         stmt = (
-            insert(Event)
+            dialect_insert(Event)
             .values(
                 id=uuid.uuid4(),
                 external_event_id=external_event_id,

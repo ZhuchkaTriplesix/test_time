@@ -23,8 +23,12 @@ async def handle_event(
     event_data: EventIngestRequest,
     session: AsyncSession = Depends(get_db),
 ):
-    async with session.begin():
-        response_data, is_created = await ingest_event(event_data, session)
+    if session.in_transaction():
+        async with session.begin_nested():
+            response_data, is_created = await ingest_event(event_data, session)
+    else:
+        async with session.begin():
+            response_data, is_created = await ingest_event(event_data, session)
 
     status_code = status.HTTP_201_CREATED if is_created else status.HTTP_200_OK
     return JSONResponse(
