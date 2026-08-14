@@ -21,6 +21,7 @@ COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 COPY src ./src
+COPY tests ./tests
 
 EXPOSE 8000
 
