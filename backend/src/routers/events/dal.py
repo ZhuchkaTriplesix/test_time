@@ -1,3 +1,11 @@
+"""Слой доступа к данным (DAL) для событий и управления тикетами.
+
+Назначение:
+- Атомарная дедупликация событий на уровне СУБД через `ON CONFLICT (external_event_id) DO NOTHING`.
+- Создание обращений в таблице `tickets`.
+- Закрытие обращений с фиксацией `closed_at` и `first_response_time`.
+"""
+
 import uuid
 from datetime import UTC, datetime
 from typing import Any

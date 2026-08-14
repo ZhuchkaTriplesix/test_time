@@ -1,3 +1,11 @@
+"""Глобальная конфигурация и фикстуры для тестового набора pytest.
+
+Назначение:
+- Создание изолированного асинхронного движка базы данных (PostgreSQL / SQLite in-memory).
+- Настройка транзакционных фикстур `db_session` и асинхронного HTTP-клиента `async_client` (`httpx.AsyncClient`).
+- Регистрация кросс-диалектной поддержки типов PostgreSQL в SQLite.
+"""
+
 import os
 from collections.abc import AsyncGenerator
 

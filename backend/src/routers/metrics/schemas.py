@@ -1,3 +1,9 @@
+"""Pydantic-схемы для отдачи аналитических метрик.
+
+Назначение:
+- Описание структуры ответа `MetricsResponse` (счетчики тикетов, медиана в секундах, временные границы).
+"""
+
 from datetime import datetime
 
 from pydantic import BaseModel, Field

@@ -1,3 +1,10 @@
+"""Слой доступа к данным (DAL) для сущности обращений (Tickets).
+
+Назначение:
+- Извлечение открытых обращений (`status = open`) с сортировкой по времени создания (`created_at ASC`).
+- Получение уникального списка направлений (`topic`) для фильтрации в веб-интерфейсе.
+"""
+
 from sqlalchemy import distinct, select
 from sqlalchemy.ext.asyncio import AsyncSession
 

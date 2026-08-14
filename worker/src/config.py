@@ -1,3 +1,10 @@
+"""Конфигурация фонового воркера (Pydantic Settings).
+
+Назначение:
+- Загрузка настроек подключения к PostgreSQL, интервалов свипера SLA (warning/overdue),
+  батчинга Outbox и параметров экспоненциального retry из переменных окружения.
+"""
+
 from functools import lru_cache
 
 from pydantic import Field

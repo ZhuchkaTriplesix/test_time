@@ -1,3 +1,10 @@
+"""Бизнес-логика чтения обращений и динамического расчета SLA.
+
+Назначение:
+- Динамический расчет времени ожидания (`wait_time_seconds`) на лету в реальном времени.
+- Определение текущего SLA-статуса (`normal`, `warning`, `overdue`) без лишних UPDATE-запросов к БД.
+"""
+
 from datetime import UTC, datetime
 
 from sqlalchemy.ext.asyncio import AsyncSession

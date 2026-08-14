@@ -1,3 +1,11 @@
+"""Процессор доставки сообщений Transactional Outbox.
+
+Назначение:
+- Фоновый опрос таблицы `outbox_events` с использованием `SELECT ... FOR UPDATE SKIP LOCKED`.
+- Отправка алертов через адаптер уведомлений.
+- Экспоненциальный retry при сетевых сбоях и перевод в `sent` / `failed`.
+"""
+
 import asyncio
 import logging
 from datetime import UTC, datetime, timedelta

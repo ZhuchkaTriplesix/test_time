@@ -1,3 +1,11 @@
+/**
+ * Корневой компонент операционной панели мониторинга SLA (App.jsx).
+ *
+ * Назначение:
+ * - Управление состоянием данных: метрики, открытые тикеты, доступные топики.
+ * - Периодический опрос API (поллинг каждые 10 секунд) с возможностью паузы.
+ * - Координация взаимодействия с модальным окном отправки событий.
+ */
 import React, { useState, useEffect, useCallback } from 'react'
 import { MetricsPanel } from './components/MetricsPanel'
 import { FilterBar } from './components/FilterBar'
