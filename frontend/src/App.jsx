@@ -87,14 +87,14 @@ export function App() {
       }
       setToast({
         type: 'success',
-        title: 'Обращение создано',
-        message: `Новый тикет от ${eventPayload.external_client_id} добавлен в очередь`,
+        title: 'Событие зарегистрировано',
+        message: `Новый тикет от ${eventPayload.external_client_id} поставлен в очередь`,
       })
       await fetchData()
     } catch (err) {
       setToast({
         type: 'error',
-        title: 'Ошибка создания',
+        title: 'Ошибка операции',
         message: err.message,
       })
       throw err
@@ -116,13 +116,13 @@ export function App() {
 
       const waitTimeText =
         ticket.wait_time_seconds < 60
-          ? `${Math.floor(ticket.wait_time_seconds)} сек`
-          : `${Math.floor(ticket.wait_time_seconds / 60)}м ${Math.floor(ticket.wait_time_seconds % 60)}с`
+          ? `${Math.floor(ticket.wait_time_seconds)}s`
+          : `${Math.floor(ticket.wait_time_seconds / 60)}m ${Math.floor(ticket.wait_time_seconds % 60)}s`
 
       setToast({
         type: 'success',
-        title: 'Ответ отправлен клиенту!',
-        message: `Обращение #${ticket.id.slice(0, 8)} закрыто за ${waitTimeText}. Метрики обновлены.`,
+        title: 'Обращение закрыто',
+        message: `Тикет #${ticket.id.slice(0, 8)} закрыт (время ответа: ${waitTimeText}). Метрики обновлены.`,
       })
       await fetchData()
     } catch (err) {
@@ -141,42 +141,48 @@ export function App() {
   }
 
   return (
-    <div className="container">
-      <header className="app-header">
-        <div className="header-title">
-          <h1>
-            <span>⏱️</span> SLA Response Time Control
-          </h1>
-          <p>
-            Мониторинг времени первой реакции операционных команд и контроль нарушений SLA
-          </p>
+    <div className="app-layout">
+      {/* Top System Bar */}
+      <header className="top-nav">
+        <div className="top-nav-brand">
+          <div className="brand-logo">SLA</div>
+          <div className="brand-titles">
+            <span className="brand-title">Response Time Control System</span>
+            <span className="brand-subtitle">Operations &bull; First Contact Resolution</span>
+          </div>
         </div>
-        <div className="header-actions">
-          <button className="btn btn-primary" onClick={() => setIsNewEventModalOpen(true)}>
-            <span>+</span>
-            <span>Новое обращение</span>
+
+        <div className="top-nav-status">
+          <div className="system-health-pill">
+            <span className="health-dot"></span>
+            <span>SYSTEM OPERATIONAL</span>
+          </div>
+          <button className="btn btn-primary btn-sm" onClick={() => setIsNewEventModalOpen(true)}>
+            + Simulate Inflow
           </button>
         </div>
       </header>
 
-      <MetricsPanel metrics={metrics} />
+      <main className="main-content">
+        <MetricsPanel metrics={metrics} />
 
-      <FilterBar
-        selectedTopic={selectedTopic}
-        onTopicChange={setSelectedTopic}
-        topics={topics}
-        isAutoRefresh={isAutoRefresh}
-        onToggleAutoRefresh={() => setIsAutoRefresh((prev) => !prev)}
-        onManualRefresh={fetchData}
-        isLoading={isLoading}
-        lastUpdated={lastUpdated}
-      />
+        <FilterBar
+          selectedTopic={selectedTopic}
+          onTopicChange={setSelectedTopic}
+          topics={topics}
+          isAutoRefresh={isAutoRefresh}
+          onToggleAutoRefresh={() => setIsAutoRefresh((prev) => !prev)}
+          onManualRefresh={fetchData}
+          isLoading={isLoading}
+          lastUpdated={lastUpdated}
+        />
 
-      <TicketTable
-        tickets={tickets}
-        total={tickets.length}
-        onAnswerTicket={handleOpenReplyModal}
-      />
+        <TicketTable
+          tickets={tickets}
+          total={tickets.length}
+          onAnswerTicket={handleOpenReplyModal}
+        />
+      </main>
 
       {/* Operator reply modal */}
       <OperatorReplyModal

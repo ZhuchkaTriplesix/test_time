@@ -1,9 +1,9 @@
 /**
- * Панель управления и фильтрации обращений.
+ * Панель инструментов фильтрации и синхронизации данных (Filter & Sync Toolbar).
  *
  * Назначение:
- * - Фильтрация таблицы тикетов по выбранному направлению (Topic).
- * - Управление автообновлением (старт/пауза) и ручной триггер обновления данных.
+ * - Строгая фильтрация таблицы обращений по доменному направлению (Topic).
+ * - Индикация статуса фоновой синхронизации (Polling 10s) и времени последнего обновления.
  */
 import React from 'react'
 
@@ -20,7 +20,7 @@ export function FilterBar({
   return (
     <div className="controls-bar">
       <div className="filter-group">
-        <label htmlFor="topic-select">Направление:</label>
+        <span className="filter-label">Направление:</span>
         <select
           id="topic-select"
           className="select-input"
@@ -36,29 +36,29 @@ export function FilterBar({
         </select>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <div className="refresh-indicator">
-          {isAutoRefresh && <span className="pulse-dot"></span>}
-          <span>
-            {isAutoRefresh ? 'Автообновление (10с)' : 'Пауза'}
+      <div className="controls-actions">
+        <div className="sync-status-indicator">
+          <span className={`status-dot ${isAutoRefresh ? 'dot-active' : 'dot-paused'}`}></span>
+          <span className="sync-text">
+            {isAutoRefresh ? 'Auto-sync: 10s' : 'Sync: Paused'}
             {lastUpdated ? ` • ${lastUpdated.toLocaleTimeString()}` : ''}
           </span>
         </div>
 
         <button
-          className="btn btn-secondary"
+          className="btn btn-secondary btn-sm"
           onClick={onToggleAutoRefresh}
-          title="Включить/выключить периодический опрос"
+          title={isAutoRefresh ? 'Приостановить автообновление' : 'Включить автообновление'}
         >
-          {isAutoRefresh ? '⏸ Пауза' : '▶ Авто'}
+          {isAutoRefresh ? 'Pause' : 'Resume'}
         </button>
 
         <button
-          className="btn btn-secondary"
+          className="btn btn-secondary btn-sm"
           onClick={onManualRefresh}
           disabled={isLoading}
         >
-          🔄 Обновить
+          {isLoading ? 'Syncing...' : 'Refresh'}
         </button>
       </div>
     </div>
