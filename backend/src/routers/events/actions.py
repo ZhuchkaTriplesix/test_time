@@ -10,11 +10,13 @@ import logging
 import uuid
 from datetime import UTC, datetime
 
+from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.routers.events.dal import EventsDAL
 from src.routers.events.models import EventType
 from src.routers.events.schemas import EventIngestRequest, EventIngestResponse
+from src.routers.tickets.models import TicketStatus
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +33,21 @@ async def ingest_event(
     dal = EventsDAL(session)
     event_timestamp = request.received_at or datetime.now(UTC)
 
-    # 1. Attempt to insert raw event (idempotency barrier)
+    # 1. Pre-validation for agent events
+    if request.event_type == EventType.AGENT and request.ticket_id is not None:
+        ticket = await dal.get_ticket_by_id(request.ticket_id)
+        if ticket is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Тикет с ID {request.ticket_id} не найден.",
+            )
+        if ticket.status == TicketStatus.CLOSED:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Обращение #{str(ticket.id)[:8]} уже закрыто.",
+            )
+
+    # 2. Attempt to insert raw event (idempotency barrier)
     event = await dal.insert_event_on_conflict_do_nothing(
         external_event_id=request.external_event_id,
         event_type=request.event_type,
@@ -60,7 +76,7 @@ async def ingest_event(
             False,
         )
 
-    # 2. Process business logic based on event type
+    # 3. Process business logic based on event type
     associated_ticket_id: uuid.UUID | None = None
 
     if request.event_type == EventType.CLIENT:
@@ -113,7 +129,7 @@ async def ingest_event(
             external_event_id=request.external_event_id,
             ticket_id=associated_ticket_id,
             event_type=request.event_type,
-            message="Event processed successfully",
+            message="Event ingested successfully",
         ),
         True,
     )
