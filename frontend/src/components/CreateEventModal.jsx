@@ -1,3 +1,10 @@
+/**
+ * Модальное диалоговое окно отправки событий (POST /api/events).
+ *
+ * Назначение:
+ * - Симуляция создания новых обращений клиентов (event_type = 'client').
+ * - Симуляция ответов операторов (event_type = 'agent') для закрытия тикетов.
+ */
 import React, { useState } from 'react'
 
 export function CreateEventModal({ isOpen, onClose, onSubmit, initialTicket }) {

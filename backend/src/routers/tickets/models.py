@@ -1,3 +1,10 @@
+"""ORM-модель обращений (Tickets) и статусы SLA.
+
+Назначение:
+- Определение перечислений `TicketStatus` (`open`, `closed`) и `SLAStatus` (`normal`, `warning`, `overdue`).
+- Определение таблицы `tickets` с индексами по статусу, топику и датам создания/ответа.
+"""
+
 import enum
 from datetime import datetime, timedelta
 

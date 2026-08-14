@@ -1,3 +1,10 @@
+"""Точка входа фонового демона обработки SLA и Outbox.
+
+Назначение:
+- Параллельный запуск двух фоновых корутин: `run_sla_sweeper` и `run_outbox_processor`.
+- Обработка сигналов завершения ОС (`SIGINT`, `SIGTERM`) для безопасного Graceful Shutdown.
+"""
+
 import asyncio
 import contextlib
 import logging

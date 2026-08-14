@@ -1,3 +1,11 @@
+"""Бизнес-логика обработки входящих событий (Event Ingestion).
+
+Назначение:
+- Проверка уникальности события через дедупликацию в слое DAL (`INSERT ... ON CONFLICT DO NOTHING`).
+- Для событий типа `client`: создание нового тикета со статусом `open` и `sla_status = normal`.
+- Для событий типа `agent`: поиск открытого тикета, расчет `first_response_time` и закрытие тикета.
+"""
+
 import logging
 import uuid
 from datetime import UTC, datetime

@@ -1,3 +1,10 @@
+"""Асинхронное подключение к PostgreSQL для воркера.
+
+Назначение:
+- Создание `AsyncEngine` и фабрики `async_sessionmaker` для независимой работы воркера.
+- Грациозная инициализация и освобождение соединений.
+"""
+
 import logging
 
 from sqlalchemy.ext.asyncio import (

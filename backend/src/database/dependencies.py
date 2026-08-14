@@ -1,3 +1,10 @@
+"""Зависимости FastAPI для работы с базой данных (Dependency Injection).
+
+Назначение:
+- Предоставление генератора `get_db` для внедрения `AsyncSession` в роутеры.
+- Обеспечение автоматического закрытия и отката транзакции при возникновении сбоев.
+"""
+
 from collections.abc import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession

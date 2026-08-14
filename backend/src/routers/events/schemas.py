@@ -1,3 +1,10 @@
+"""Pydantic-схемы валидации запросов и ответов для событий.
+
+Назначение:
+- Валидация входных данных `POST /api/events` (наличие полей, типы, кастомная валидация клиента/тикета).
+- Формирование типизированного ответа `EventIngestResponse` (`created` / `duplicate`).
+"""
+
 import uuid
 from datetime import datetime
 from typing import Any

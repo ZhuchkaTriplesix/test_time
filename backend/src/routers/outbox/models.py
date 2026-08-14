@@ -1,3 +1,11 @@
+"""ORM-модель для паттерна Transactional Outbox (`outbox_events`).
+
+Назначение:
+- Хранение задач на отправку алертов и нотификаций о нарушениях SLA.
+- Обеспечение атомарности (сохраняется в единой транзакции с обновлением тикета).
+- Индексация по `(status, available_at)` для эффективной выборки воркером через `SKIP LOCKED`.
+"""
+
 import enum
 import uuid
 from datetime import datetime

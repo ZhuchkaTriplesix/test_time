@@ -1,3 +1,10 @@
+"""ORM-модели базы данных для изолированного использования воркером.
+
+Назначение:
+- Модели `Ticket` и `OutboxEvent` с перечислениями статусов (`TicketStatus`, `SLAStatus`, `OutboxStatus`).
+- Позволяет воркеру работать автономно без прямой зависимости от пакета бэкенда.
+"""
+
 import enum
 import uuid
 from datetime import UTC, datetime, timedelta

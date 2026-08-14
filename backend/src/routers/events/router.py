@@ -1,3 +1,11 @@
+"""HTTP-маршрутизатор приема входящих событий (`POST /api/events`).
+
+Назначение:
+- Прием клиентских обращений и ответов сотрудников.
+- Атомарное выполнение бизнес-логики внутри транзакции.
+- Возврат `201 Created` для новых событий и `200 OK` для дубликатов (идемпотентность).
+"""
+
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
