@@ -1,3 +1,10 @@
+"""Базовые классы и миксины для ORM-моделей SQLAlchemy.
+
+Назначение:
+- Декларативная база моделей `Base` (`DeclarativeBase`).
+- Миксины для добавления временных меток (`created_at`, `updated_at`) и первичных ключей (`UUIDMixin`).
+"""
+
 import uuid
 from datetime import UTC, datetime
 

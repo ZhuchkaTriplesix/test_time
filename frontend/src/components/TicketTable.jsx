@@ -1,3 +1,10 @@
+/**
+ * Компонент таблицы открытых обращений.
+ *
+ * Назначение:
+ * - Отображение обращений с секундомером ожидания и понятным бейджем SLA (текст + цвет: NORMAL, WARNING, OVERDUE).
+ * - Быстрое действие "Ответить" для закрытия тикета.
+ */
 import React from 'react'
 
 export function TicketTable({ tickets, total, onAnswerTicket }) {

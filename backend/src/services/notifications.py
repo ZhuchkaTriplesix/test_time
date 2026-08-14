@@ -1,3 +1,11 @@
+"""Сервисный слой и адаптеры доставки уведомлений о нарушениях SLA.
+
+Назначение:
+- Абстрактный интерфейс `NotificationAdapter` для отправки алертов внешним системам.
+- Реализация `LocalLogNotificationAdapter` для локального логирования и тестирования.
+- Поддержка настраиваемой задержки (`delay_seconds`) для верификации неблокирующего Event Loop.
+"""
+
 import asyncio
 import logging
 from abc import ABC, abstractmethod

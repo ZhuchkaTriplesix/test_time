@@ -1,3 +1,10 @@
+"""HTTP-маршрутизатор для аналитических показателей (`GET /api/metrics`).
+
+Назначение:
+- Получение сводной статистики: общее число созданных, закрытых и просроченных тикетов.
+- Получение медианного времени первого ответа (`median_first_response_time_seconds`).
+"""
+
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, Query

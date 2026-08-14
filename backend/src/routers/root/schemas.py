@@ -1,3 +1,9 @@
+"""Pydantic-схемы для системного эндпоинта Health Check.
+
+Назначение:
+- Описание структуры ответа `HealthCheckResponse` (статус API и доступность БД).
+"""
+
 from pydantic import BaseModel
 
 

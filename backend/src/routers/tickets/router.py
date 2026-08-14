@@ -1,3 +1,10 @@
+"""HTTP-маршрутизатор для чтения и фильтрации обращений (`GET /api/tickets`).
+
+Назначение:
+- Получение списка открытых обращений с опциональной фильтрацией по направлению (`topic`).
+- Предоставление актуального списка доступных тематик для UI-фильтров.
+"""
+
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 

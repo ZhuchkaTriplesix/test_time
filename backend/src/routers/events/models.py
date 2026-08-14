@@ -1,3 +1,10 @@
+"""ORM-модель входящих событий (Events).
+
+Назначение:
+- Определение таблицы `events` с уникальным ограничением `UNIQUE (external_event_id)` для идемпотентности.
+- Хранение полезной нагрузки (`payload` в JSONB) и метаданных события.
+"""
+
 import enum
 import uuid
 from datetime import datetime

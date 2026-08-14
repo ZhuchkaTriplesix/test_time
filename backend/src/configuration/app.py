@@ -1,3 +1,13 @@
+"""Фабрика конфигурации приложения FastAPI (App Factory).
+
+Назначение:
+- Создание и настройка экземпляра FastAPI (`FastAPI`).
+- Регистрация глобальных middleware (CORS, замер времени, логирование).
+- Подключение глобальных обработчиков исключений (Exception Handler).
+- Управление жизненным циклом приложения (Lifespan: инициализация и закрытие пула БД).
+- Регистрация API-роутеров.
+"""
+
 import logging
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
