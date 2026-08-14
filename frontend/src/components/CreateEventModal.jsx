@@ -1,35 +1,35 @@
 /**
- * Модальное окно симуляции входящих клиентских обращений (POST /api/events).
+ * Модальное окно симуляции входящих событий (Event Generator Modal).
  *
  * Назначение:
- * - Генерация новых тестовых обращений от клиентов с выбором темы и текста.
- * - Быстрые пресеты обращений для удобства тестирования и демонстрации работы SLA.
+ * - Генерация тестовых входящих событий клиента через POST /api/events.
+ * - Выбор пресетов доменных направлений.
  */
 import React, { useState } from 'react'
 
 const TOPIC_PRESETS = [
   {
     topic: 'Техническая поддержка',
-    clientId: 'tg_user_ivan_45',
-    content: 'Не могу войти в личный кабинет через мобильное приложение, пишет ошибку сети.',
+    clientId: 'tg_user_8912',
+    content: 'Ошибка авторизации через SSO в мобильном клиенте.',
   },
   {
     topic: 'Платежи и биллинг',
-    clientId: 'crm_client_elena_88',
-    content: 'Списались деньги за подписку Premium дважды за август. Пожалуйста, оформите возврат.',
+    clientId: 'crm_client_1042',
+    content: 'Повторное списание абонентской платы за расчетный период.',
   },
   {
     topic: 'Общие вопросы',
-    clientId: 'tg_alex_99',
-    content: 'Подскажите график работы службы поддержки в праздничные дни.',
+    clientId: 'web_guest_303',
+    content: 'Запрос регламента SLA и времени доступности технической поддержки.',
   },
 ]
 
 export function CreateEventModal({ isOpen, onClose, onSubmit }) {
-  const [clientId, setClientId] = useState('tg_user_ivan_45')
+  const [clientId, setClientId] = useState('tg_user_8912')
   const [topic, setTopic] = useState('Техническая поддержка')
   const [content, setContent] = useState(
-    'Не могу войти в личный кабинет через мобильное приложение, пишет ошибку сети.'
+    'Ошибка авторизации через SSO в мобильном клиенте.'
   )
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -68,8 +68,8 @@ export function CreateEventModal({ isOpen, onClose, onSubmit }) {
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <div>
-            <h3>📥 Создание нового обращения клиента</h3>
-            <p className="modal-subtitle">Симуляция входящего события через POST /api/events</p>
+            <h3>Генерация входящего обращения</h3>
+            <p className="modal-subtitle">Симуляция POST /api/events (event_type: client)</p>
           </div>
           <button className="modal-close-btn" onClick={onClose}>
             ✕
@@ -78,7 +78,7 @@ export function CreateEventModal({ isOpen, onClose, onSubmit }) {
 
         {/* Preset chips */}
         <div className="canned-responses-section" style={{ marginBottom: '1rem' }}>
-          <label className="canned-title">Быстрые примеры обращений:</label>
+          <span className="canned-title">Пресеты направлений:</span>
           <div className="canned-chips-container">
             {TOPIC_PRESETS.map((p, idx) => (
               <button
@@ -87,7 +87,7 @@ export function CreateEventModal({ isOpen, onClose, onSubmit }) {
                 className="canned-chip"
                 onClick={() => handleApplyPreset(p)}
               >
-                📌 {p.topic}
+                {p.topic}
               </button>
             ))}
           </div>
@@ -95,13 +95,13 @@ export function CreateEventModal({ isOpen, onClose, onSubmit }) {
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>ID клиента / канала:</label>
+            <label>Идентификатор клиента / канала:</label>
             <input
               type="text"
               className="form-control"
               value={clientId}
               onChange={(e) => setClientId(e.target.value)}
-              placeholder="Например: tg_user_8912"
+              placeholder="tg_user_8912"
               required
             />
           </div>
@@ -113,19 +113,19 @@ export function CreateEventModal({ isOpen, onClose, onSubmit }) {
               className="form-control"
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
-              placeholder="Например: Техническая поддержка"
+              placeholder="Техническая поддержка"
               required
             />
           </div>
 
           <div className="form-group">
-            <label>Текст сообщения клиента:</label>
+            <label>Содержание обращения:</label>
             <textarea
               className="form-control"
               rows={3}
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Опишите вопрос клиента..."
+              placeholder="Текст вопроса клиента..."
               required
             ></textarea>
           </div>
@@ -135,7 +135,7 @@ export function CreateEventModal({ isOpen, onClose, onSubmit }) {
               Отмена
             </button>
             <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-              {isSubmitting ? 'Отправка...' : '+ Создать обращение'}
+              {isSubmitting ? 'Отправка...' : 'Сгенерировать событие'}
             </button>
           </div>
         </form>

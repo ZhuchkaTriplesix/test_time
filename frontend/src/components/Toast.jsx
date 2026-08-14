@@ -1,9 +1,8 @@
 /**
- * Всплывающее Toast-уведомление об успешных действиях и ошибках.
+ * Компонент системных Toast-уведомлений.
  *
  * Назначение:
- * - Отображение подтверждения отправки ответа клиенту и закрытия тикета.
- * - Вывод ошибок без блокирующих браузерных alert().
+ * - Вывод неблокирующих подтверждений операций и ошибок.
  */
 import React, { useEffect } from 'react'
 
@@ -22,7 +21,6 @@ export function Toast({ toast, onClose }) {
 
   return (
     <div className={`toast-container ${isError ? 'toast-error' : 'toast-success'}`}>
-      <div className="toast-icon">{isError ? '❌' : '✅'}</div>
       <div className="toast-body">
         <div className="toast-title">{toast.title}</div>
         {toast.message && <div className="toast-message">{toast.message}</div>}

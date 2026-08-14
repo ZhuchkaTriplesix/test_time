@@ -1,29 +1,29 @@
 /**
- * Модальное окно ответа оператора на обращение клиента (UX Response Interface).
+ * Модальное окно ответа оператора (Service Desk Resolution Window).
  *
  * Назначение:
- * - Отображение полного контекста обращения клиента (имя, канал, текст, время ожидания, статус SLA).
- * - Предоставление быстрых готовых шаблонов ответов (Canned Responses) в один клик.
- * - Удобный ввод текста с поддержкой горячих клавиш Ctrl+Enter / Cmd+Enter для мгновенной отправки.
+ * - Контекст тикета: идентификатор, источник, текст вопроса, таймер ожидания.
+ * - Быстрые деловые шаблоны ответов.
+ * - Поддержка шортката Ctrl+Enter / Cmd+Enter для моментального закрытия обращения.
  */
 import React, { useState, useEffect, useRef } from 'react'
 
 const CANNED_RESPONSES = [
   {
-    label: '✨ Вопрос решен',
-    text: 'Здравствуйте! Ваш вопрос успешно решен, пожалуйста, проверьте доступ.',
+    label: 'Запрос решен',
+    text: 'Здравствуйте! Ваш запрос обработан, проблема успешно устранена.',
   },
   {
-    label: '💳 Оплата зачислена',
-    text: 'Здравствуйте! Платеж успешно найден и зачислен на ваш баланс. Приносим извинения за ожидание.',
+    label: 'Зачисление платежа',
+    text: 'Здравствуйте! Платеж идентифицирован и успешно зачислен на ваш баланс.',
   },
   {
-    label: '🛠 Передано разработчикам',
-    text: 'Здравствуйте! Передали информацию в технический отдел, исправление будет выпущено в ближайшее время.',
+    label: 'Эскалация в L2',
+    text: 'Здравствуйте! Обращение передано профильным инженерам. Ожидайте обновления статуса.',
   },
   {
-    label: '❓ Запрос деталей',
-    text: 'Здравствуйте! Подскажите, пожалуйста, модель вашего устройства и версию приложения?',
+    label: 'Уточнение деталей',
+    text: 'Здравствуйте! Уточните, пожалуйста, точное время возникновения ошибки и номер операции.',
   },
 ]
 
@@ -63,7 +63,7 @@ export function OperatorReplyModal({ isOpen, onClose, ticket, onSubmit }) {
       ticket_id: ticket.id,
       content: replyText.trim(),
       payload: {
-        agent_name: 'Оператор поддержки',
+        agent_id: 'ops_agent_primary',
       },
     }
 
@@ -71,7 +71,7 @@ export function OperatorReplyModal({ isOpen, onClose, ticket, onSubmit }) {
       await onSubmit(payload, ticket)
       onClose()
     } catch (err) {
-      // Error handled by parent
+      // Handled by parent
     } finally {
       setIsSubmitting(false)
     }
@@ -85,22 +85,21 @@ export function OperatorReplyModal({ isOpen, onClose, ticket, onSubmit }) {
   }
 
   const formatWaitTime = (seconds) => {
-    if (seconds < 60) return `${Math.floor(seconds)} сек`
+    if (seconds < 60) return `${Math.floor(seconds)}s`
     const m = Math.floor(seconds / 60)
     const s = Math.floor(seconds % 60)
-    return `${m}м ${s}с`
+    return `${m}m ${s}s`
   }
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content operator-reply-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <div className="operator-modal-title">
-            <span className="operator-title-icon">💬</span>
-            <div>
-              <h3>Ответ на обращение #{ticket.id.slice(0, 8)}</h3>
-              <p className="modal-subtitle">Отправка ответа клиенту и фиксация времени первой реакции</p>
-            </div>
+          <div>
+            <h3>Ответ на обращение #{ticket.id.slice(0, 8)}</h3>
+            <p className="modal-subtitle">
+              Фиксация первого ответа оператора и закрытие тикета в базе данных
+            </p>
           </div>
           <button className="modal-close-btn" onClick={onClose}>
             ✕
@@ -111,11 +110,8 @@ export function OperatorReplyModal({ isOpen, onClose, ticket, onSubmit }) {
         <div className="client-context-card">
           <div className="client-context-header">
             <div className="client-info">
-              <span className="client-avatar">👤</span>
-              <div>
-                <strong>{ticket.external_client_id}</strong>
-                <span className="topic-tag-pill">{ticket.topic}</span>
-              </div>
+              <span className="client-id-strong">{ticket.external_client_id}</span>
+              <span className="topic-tag-pill">{ticket.topic}</span>
             </div>
             <div className="client-sla-info">
               <span
@@ -127,21 +123,23 @@ export function OperatorReplyModal({ isOpen, onClose, ticket, onSubmit }) {
                     : 'pill-normal'
                 }`}
               >
-                {ticket.sla_status === 'overdue' ? '🚨 Overdue' : ticket.sla_status === 'warning' ? '⚠️ Warning' : '🟢 Normal'}
+                {ticket.sla_status.toUpperCase()}
               </span>
-              <span className="wait-time-badge">⏱ ждет {formatWaitTime(ticket.wait_time_seconds)}</span>
+              <span className="wait-time-badge">
+                Время ожидания: <strong>{formatWaitTime(ticket.wait_time_seconds)}</strong>
+              </span>
             </div>
           </div>
 
           <div className="client-message-bubble">
-            <div className="bubble-label">Сообщение клиента:</div>
+            <div className="bubble-label">Текст обращения клиента:</div>
             <div className="bubble-text">{ticket.content}</div>
           </div>
         </div>
 
         {/* Quick Canned Responses */}
         <div className="canned-responses-section">
-          <label className="canned-title">Быстрые шаблоны ответов (клик для вставки):</label>
+          <span className="canned-title">Шаблоны быстрых ответов:</span>
           <div className="canned-chips-container">
             {CANNED_RESPONSES.map((item, idx) => (
               <button
@@ -158,7 +156,7 @@ export function OperatorReplyModal({ isOpen, onClose, ticket, onSubmit }) {
 
         {/* Reply text input */}
         <div className="reply-input-section">
-          <label htmlFor="reply-textarea">Текст вашего ответа:</label>
+          <label htmlFor="reply-textarea">Текст ответа:</label>
           <textarea
             id="reply-textarea"
             ref={textareaRef}
@@ -167,11 +165,11 @@ export function OperatorReplyModal({ isOpen, onClose, ticket, onSubmit }) {
             value={replyText}
             onChange={(e) => setReplyText(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Введите текст ответа клиенту..."
+            placeholder="Введите ответ клиенту..."
             required
           />
           <div className="reply-hint">
-            <span>💡 Подсказка: нажмите <strong>Ctrl + Enter</strong> (или <strong>Cmd + Enter</strong>) для быстрой отправки</span>
+            <span>Используйте <strong>Ctrl + Enter</strong> (или <strong>⌘ + Enter</strong>) для быстрой отправки</span>
             <span className="char-count">{replyText.length} симв.</span>
           </div>
         </div>
@@ -182,11 +180,11 @@ export function OperatorReplyModal({ isOpen, onClose, ticket, onSubmit }) {
           </button>
           <button
             type="button"
-            className="btn btn-primary btn-submit-reply"
+            className="btn btn-primary"
             onClick={handleSend}
             disabled={isSubmitting || !replyText.trim()}
           >
-            {isSubmitting ? 'Отправка...' : '✉️ Отправить ответ и закрыть тикет'}
+            {isSubmitting ? 'Отправка...' : 'Отправить и закрыть тикет'}
           </button>
         </div>
       </div>
