@@ -4,7 +4,6 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import ORJSONResponse
 
 from src.config import get_settings
 from src.database.core import close_db_engine, get_db_engine
@@ -35,7 +34,6 @@ class App:
             title=settings.APP_NAME,
             version=settings.APP_VERSION,
             description="Service for tracking customer ticket first response times, SLA breaches and analytics.",
-            default_response_class=ORJSONResponse,
             lifespan=lifespan,
         )
         self._configure_middlewares()
@@ -52,6 +50,17 @@ class App:
         )
         # 2. Custom Logging and Timing Middleware
         self._app.add_middleware(LoggingAndErrorMiddleware)
+
+        # 3. Global Exception Handler
+        @self._app.exception_handler(Exception)
+        async def unhandled_exception_handler(request, exc):
+            logger.error("Unhandled server error: %s", exc)
+            from fastapi.responses import JSONResponse
+
+            return JSONResponse(
+                status_code=500,
+                content={"error": "Internal Server Error", "detail": str(exc)},
+            )
 
     def _configure_routes(self) -> None:
         self._app.include_router(api_router)

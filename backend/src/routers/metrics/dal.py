@@ -48,21 +48,44 @@ class MetricsDAL:
             total_overdue_stmt = total_overdue_stmt.where(*created_filter)
         total_overdue = (await self.session.execute(total_overdue_stmt)).scalar() or 0
 
-        # 4. Median first response time (seconds) using percentile_cont(0.5) in PostgreSQL
-        # Extract epoch in seconds from first_response_time interval
-        epoch_seconds = func.extract("epoch", Ticket.first_response_time)
-        median_stmt = (
-            select(
-                func.percentile_cont(0.5).within_group(epoch_seconds.asc()).label("median_seconds")
+        # 4. Median first response time (seconds)
+        bind = self.session.bind or self.session.get_bind()
+        if bind and bind.dialect.name == "sqlite":
+            # SQLite fallback for test environment
+            tickets_stmt = select(Ticket.first_response_time).where(
+                Ticket.status == TicketStatus.CLOSED,
+                Ticket.first_response_time.isnot(None),
             )
-            .where(Ticket.status == TicketStatus.CLOSED)
-            .where(Ticket.first_response_time.isnot(None))
-        )
-        if created_filter:
-            median_stmt = median_stmt.where(*created_filter)
+            if created_filter:
+                tickets_stmt = tickets_stmt.where(*created_filter)
+            intervals = (await self.session.execute(tickets_stmt)).scalars().all()
+            if intervals:
+                import statistics
 
-        median_result = (await self.session.execute(median_stmt)).scalar()
-        median_val = round(float(median_result), 2) if median_result is not None else None
+                seconds_list = [
+                    i.total_seconds() if hasattr(i, "total_seconds") else float(i)
+                    for i in intervals
+                ]
+                median_val = round(float(statistics.median(seconds_list)), 2)
+            else:
+                median_val = None
+        else:
+            # PostgreSQL: percentile_cont(0.5) computed directly in the database
+            epoch_seconds = func.extract("epoch", Ticket.first_response_time)
+            median_stmt = (
+                select(
+                    func.percentile_cont(0.5)
+                    .within_group(epoch_seconds.asc())
+                    .label("median_seconds")
+                )
+                .where(Ticket.status == TicketStatus.CLOSED)
+                .where(Ticket.first_response_time.isnot(None))
+            )
+            if created_filter:
+                median_stmt = median_stmt.where(*created_filter)
+
+            median_result = (await self.session.execute(median_stmt)).scalar()
+            median_val = round(float(median_result), 2) if median_result is not None else None
 
         return {
             "total_created": total_created,

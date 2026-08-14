@@ -26,8 +26,9 @@ known-first-party = ["src"]
 combine-as-imports = true
 
 [lint.per-file-ignores]
-"**/tests/*" = ["T201", "PT004", "PT011"]
-"**/alembic/versions/*" = ["E", "F"]
+"**/tests/*" = ["S101", "D", "ARG", "FBT", "PLR2004"]
+"**/alembic/versions/*" = ["D", "E501"]
+"scripts/*" = ["T201", "T203"]
 
 [format]
 quote-style = "double"
